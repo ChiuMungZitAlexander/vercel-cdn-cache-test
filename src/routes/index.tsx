@@ -1,17 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
 import { getData } from "../api/notion-data";
 
 export const Route = createFileRoute("/")({
   component: App,
-  loader: async () => {
-    const data = await getData();
-    return data;
-  },
 });
 
 function App() {
-  const data = Route.useLoaderData();
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["notion-data"],
+    queryFn: getData,
+    staleTime: 3600 * 1000,
+    gcTime: 3600 * 1000,
+  });
+
+  if (isLoading) {
+    return <div>Loading data...</div>;
+  }
+
+  if (isError) {
+    return <div>Failed to load data: {error.message}</div>;
+  }
 
   return <div>Data: {data}</div>;
 }
