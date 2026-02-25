@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
-import { getData } from "../api/notion-data";
+async function getData() {
+  const response = await fetch("/api/notion-data", {
+    method: "GET",
+    cache: "force-cache",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch notion data: ${response.status}`);
+  }
+
+  return (await response.json()) as number;
+}
 
 export const Route = createFileRoute("/")({
   component: App,
